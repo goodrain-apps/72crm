@@ -156,6 +156,7 @@ class Leads extends Common
 	public function createData($param)
 	{
 		$fieldModel = new \app\admin\model\Field();
+		$userModel = new \app\admin\model\User();
 		// 自动验证
 		$validateArr = $fieldModel->validateField($this->name); //获取自定义字段验证规则
 		$validate = new Validate($validateArr['rule'], $validateArr['message']);
@@ -186,7 +187,8 @@ class Leads extends Common
 				array('name'=>'来源', 'value'=>$param['source']),
 				array('name'=>'行业', 'value'=>$param['industry']),
 			);
-			sendNotify('CRM线索变更通知', '新建线索:'.$param['name'], $sendData);	
+			$createUser = $userModel->getDataById($param['create_user_id']) ?: array();
+			sendNotify('CRM线索变更通知', $createUser['realname'].'新建线索:'.$param['name'], $sendData);	
 			$data = [];
 			$data['leads_id'] = $this->leads_id;
 			return $data;

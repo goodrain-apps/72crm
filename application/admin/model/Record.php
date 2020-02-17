@@ -371,6 +371,7 @@ class Record extends Common
 		$customerModel = new \app\crm\model\Customer();
 		$leadsModel = new \app\crm\model\Leads();
 		$eventModel = new \app\oa\model\Event();
+		$userModel = new \app\admin\model\User();
 		if (!$param['types'] || !$param['types_id'] || !in_array($param['types'], $this->types_arr)) {
 			$this->error = '参数错误';
 			return false;
@@ -417,6 +418,8 @@ class Record extends Common
 					$sendData[] = array('name'=>$param['types'], 'value'=>$param['types_id']);
 			}
 			$sendData[] = array('name'=>'根据类型', 'value'=>$param['category']);
+			$createUser = $userModel->getDataById($param['create_user_id']) ?: array();
+			$sendData[] = array('name'=>'记录人', 'value'=>$createUser['realname']);
 			sendNotify('CRM跟踪记录变更通知', $param['content'], $sendData);
 			$data = [];
 			$data['record_id'] = $this->record_id;

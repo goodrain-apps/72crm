@@ -225,6 +225,7 @@ class Customer extends Common
 	public function createData($param)
 	{
 		$fieldModel = new \app\admin\model\Field();
+		$userModel = new \app\admin\model\User();
 		//线索转客户
 		if ($param['leads_id']) {
 			$leadsData = $param;
@@ -270,7 +271,8 @@ class Customer extends Common
 				array('name'=>'联系方式', 'value'=>$pvalue),
 				array('name'=>'来源', 'value'=>$param['source']),
 			);
-			sendNotify('CRM客户变更通知', '新建客户:'.$param['name'], $sendData);
+			$createUser = $userModel->getDataById($param['create_user_id']) ?: array();
+			sendNotify('CRM客户变更通知', $createUser['realname'].'新建客户:'.$param['name'], $sendData);
 			$data = [];
 			$data['customer_id'] = $this->customer_id;
 			$data['name'] = $param['name'];
