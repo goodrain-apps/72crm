@@ -368,6 +368,8 @@ class Record extends Common
 	 */	
 	public function createData($param)
 	{
+		$customerModel = new \app\crm\model\Customer();
+		$leadsModel = new \app\crm\model\Leads();
 		$eventModel = new \app\oa\model\Event();
 		if (!$param['types'] || !$param['types_id'] || !in_array($param['types'], $this->types_arr)) {
 			$this->error = '参数错误';
@@ -397,8 +399,25 @@ class Record extends Common
 		        }
 			}
 			// 处理通知信息
-			sendNotify('CRM跟踪记录变更通知', $param['content'], null);
-			Log::record('CRM跟踪记录变更通知','info');
+			$sendData = array();
+			switch ($param['types']) {
+				case "crm_leads":
+					$lead = $leadsModel->getDataById($param['types_id']);
+					if ($lead) {
+						$sendData[] = array('name'=>'线索名称', 'value'=>$lead['name']);
+					}
+					break;
+				case "crm_customer":
+					$customer = $customerModel->getDataById($param['types_id']);
+					if ($customer) {
+						$sendData[] = array('name'=>'客户名称', 'value'=>$customer['name']);
+					}
+					break;
+				default:
+					$sendData[] = array('name'=>$param['types'], 'value'=>$param['types_id']);
+			}
+			$sendData[] = array('name'=>'根据类型', 'value'=>$param['category']);
+			sendNotify('CRM跟踪记录变更通知', $param['content'], $sendData);
 			$data = [];
 			$data['record_id'] = $this->record_id;
 			return $data;
