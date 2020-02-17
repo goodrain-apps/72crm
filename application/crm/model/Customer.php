@@ -259,7 +259,18 @@ class Customer extends Common
 		}
 		if ($this->data($param)->allowField(true)->isUpdate(false)->save()) {
 			//修改记录
-			updateActionLog($param['create_user_id'], 'crm_customer', $this->customer_id, '', '', '创建了客户');			
+			updateActionLog($param['create_user_id'], 'crm_customer', $this->customer_id, '', '', '创建了客户:'.$param['name']);
+			$pvalue = $param['telephone'];
+			if (array_key_exists('mobile',$param) && $param['mobile'] != '') {
+				$pvalue = $param['mobile'];
+			}
+			$sendData = array(
+				array('name'=>'名称', 'value'=>$param['name']),
+				array('name'=>'级别', 'value'=>$param['level']),
+				array('name'=>'联系方式', 'value'=>$pvalue),
+				array('name'=>'来源', 'value'=>$param['source']),
+			);
+			sendNotify('CRM客户变更通知', '新建客户:'.$param['name'], $sendData);
 			$data = [];
 			$data['customer_id'] = $this->customer_id;
 			$data['name'] = $param['name'];

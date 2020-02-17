@@ -174,7 +174,19 @@ class Leads extends Common
 
 		if ($this->data($param)->allowField(true)->isUpdate(false)->save()) {
 			//修改记录
-			updateActionLog($param['create_user_id'], 'crm_leads', $this->leads_id, '', '', '创建了线索');			
+			updateActionLog($param['create_user_id'], 'crm_leads', $this->leads_id, '', '', '创建了线索');
+			$pvalue = $param['telephone'];
+			if (array_key_exists('mobile',$param) && $param['mobile'] != '') {
+				$pvalue = $param['mobile'];
+			}
+			$sendData = array(
+				array('name'=>'名称', 'value'=>$param['name']),
+				array('name'=>'级别', 'value'=>$param['level']),
+				array('name'=>'联系方式', 'value'=>$pvalue),
+				array('name'=>'来源', 'value'=>$param['source']),
+				array('name'=>'行业', 'value'=>$param['industry']),
+			);
+			sendNotify('CRM线索变更通知', '新建线索:'.$param['name'], $sendData);	
 			$data = [];
 			$data['leads_id'] = $this->leads_id;
 			return $data;

@@ -1363,3 +1363,26 @@ function setting($data)
     }
     return $setting = substr($setting,0,strlen($setting) -1 ) .')';
 }
+
+
+function sendNotify($title, $describe, $data)
+{
+    $postdata = array(
+        'title' => $title,
+        'describe' => $describe,
+        'extensions' => $data 
+    );
+    $url = "https://log.rainbond.com/message/default";
+    $postdataJson = json_encode($postdata);
+    $options = array(
+        'http' => array(
+            'method' => 'POST',
+            'header' => 'Content-type:application/json',
+            'content' => $postdataJson,
+            'timeout' => 15 * 60 // 超时时间（单位:s）
+        )
+    );
+    $context = stream_context_create($options);
+    $result = file_get_contents($url, false, $context);
+    return $result;
+}

@@ -387,7 +387,6 @@ class Record extends Common
 		if ($this->data($param)->allowField(true)->save()) {
 			//下次联系时间
 			$this->updateNexttime($param['types'], $param['types_id'], $param['next_time']);
-
 			//处理附件关系
 	        if ($fileArr) {
 	            $fileModel = new \app\admin\model\File();
@@ -396,8 +395,10 @@ class Record extends Common
 		        	$this->error = '附件上传失败';
 		        	return false;
 		        }
-	        }
-
+			}
+			// 处理通知信息
+			sendNotify('CRM跟踪记录变更通知', $param['content'], null);
+			Log::record('CRM跟踪记录变更通知','info');
 			$data = [];
 			$data['record_id'] = $this->record_id;
 			return $data;
